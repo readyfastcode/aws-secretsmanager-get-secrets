@@ -142,7 +142,7 @@ export function injectSecret(secretName: string, secretValue: string, parseJsonS
             secretsToCleanup = [...secretsToCleanup, ...injectSecret(secretName, keyValue, parseJsonSecrets, k)];
         }
     } else {
-        const envName = tempEnvName ? transformToValidEnvName(tempEnvName) : transformToValidEnvName(secretName);
+        const envName = tempEnvName ? tempEnvName : transformToValidEnvName(secretName);
 
         // Fail the action if this variable name is already in use, or is our cleanup name
         if (process.env[envName] || envName === CLEANUP_NAME) {
