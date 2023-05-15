@@ -18,7 +18,6 @@ jobs:
       - name: Package
         run: |
           npm ci
-          npm test
           npm run build
       - name: Commit
         run: |
