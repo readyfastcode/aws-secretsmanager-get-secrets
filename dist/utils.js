@@ -78,7 +78,7 @@ function getSecretsWithPrefix(client, prefix, hasAlias) {
         const params = {
             Filters: [
                 {
-                    Key: "name",
+                    Key: 'name',
                     Values: [
                         prefix.replace('*', ''),
                     ]
@@ -157,22 +157,25 @@ function injectSecret(secretName, secretValue, parseJsonSecrets, tempEnvName) {
         for (const k in secretMap) {
             const keyValue = typeof secretMap[k] === 'string' ? secretMap[k] : JSON.stringify(secretMap[k]);
             // Append the current key to the name of the env variable
-            const newEnvName = `${tempEnvName || transformToValidEnvName(secretName)}_${transformToValidEnvName(k)}`;
-            secretsToCleanup = [...secretsToCleanup, ...injectSecret(secretName, keyValue, parseJsonSecrets, newEnvName)];
+            // const newEnvName = `${tempEnvName || transformToValidEnvName(secretName)}_${transformToValidEnvName(k)}`;
+            secretsToCleanup = [...secretsToCleanup, ...injectSecret(secretName, keyValue, parseJsonSecrets, k)];
         }
     }
     else {
-        const envName = tempEnvName ? transformToValidEnvName(tempEnvName) : transformToValidEnvName(secretName);
+        const envName = tempEnvName ? tempEnvName : transformToValidEnvName(secretName);
         // Fail the action if this variable name is already in use, or is our cleanup name
         if (process.env[envName] || envName === constants_1.CLEANUP_NAME) {
-            throw new Error(`The environment name '${envName}' is already in use. Please use an alias to ensure that each secret has a unique environment name`);
+            // throw new Error(`The environment name '${ envName }' is already in use. Please use an alias to ensure that each secret has a unique environment name`);
+            console.error(`The environment name '${envName}' is already in use. Please use an alias to ensure that each secret has a unique environment name`);
         }
-        // Inject a single secret
-        core.setSecret(secretValue);
-        // Export variable
-        core.debug(`Injecting secret ${secretName} as environment variable '${envName}'.`);
-        core.exportVariable(envName, secretValue);
-        secretsToCleanup.push(envName);
+        else {
+            // Inject a single secret
+            core.setSecret(secretValue);
+            // Export variable
+            core.debug(`Injecting secret ${secretName} as environment variable '${envName}'.`);
+            core.exportVariable(envName, secretValue);
+            secretsToCleanup.push(envName);
+        }
     }
     return secretsToCleanup;
 }
